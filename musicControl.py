@@ -10,7 +10,7 @@ isPaused = False
 
 global songList = []
 
-global path = "/musicControl/"
+global path = "/songLists/"
 
 port = serial.Serial("/dev/tty.usbserial-AH02LQCH", 57600, timeout=0.5)
 
@@ -47,15 +47,19 @@ print currentSide, currentHeading
 volume = 0.5 * volumeScale
 deltaVolume = 0
 
-def getAllSongNames():
-    file = 
+def readSongData():
+    global songList
+
+    names = open(path + "songNames.txt")
+    songList = names.splitlines()
 
 while True:
     global globalPlayer
     global currentSongIndex
     global isPaused
 
-    globalPlayer = OMXPlayer("/musicControl/testSong.mp3")
+    readSongData()
+    globalPlayer = OMXPlayer(path + "testSong.mp3")
     if(!globalPlayer.is_playing() and !isPaused):
         nextsong()
 
