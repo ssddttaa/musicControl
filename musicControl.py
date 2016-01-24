@@ -47,6 +47,9 @@ print currentSide, currentHeading
 volume = 0.5 * volumeScale
 deltaVolume = 0
 
+def getAllSongNames():
+    file = 
+
 while True:
     global globalPlayer
     global currentSongIndex
