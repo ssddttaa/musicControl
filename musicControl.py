@@ -8,11 +8,11 @@ currentSongIndex = 0
 
 isPaused = False
 
-global songList = []
+songList = []
 
-global path = "/songLists/"
+path = "/songLists/"
 
-port = serial.Serial("/dev/tty.usbserial-AH02LQCH", 57600, timeout=0.5)
+port = serial.Serial("/dev/ttyS0", 57600, timeout=0.5)
 
 volumeAngle = 45.0
 volumeScale = 100
@@ -54,13 +54,9 @@ def readSongData():
     songList = names.splitlines()
 
 while True:
-    global globalPlayer
-    global currentSongIndex
-    global isPaused
-
     readSongData()
-    globalPlayer = OMXPlayer(path + "testSong.mp3")
-    if(!globalPlayer.is_playing() and !isPaused):
+    globalPlayer = OMXPlayer(path + songList[0])
+    if(not globalPlayer.is_playing() and not isPaused):
         nextsong()
 
     while port.inWaiting() < 2:
