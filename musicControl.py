@@ -10,15 +10,15 @@ isPaused = False
 
 songList = []
 
-path = "/songLists/"
+path = "songLists/"
 
-port = serial.Serial("/dev/ttyS0", 57600, timeout=0.5)
+port = serial.Serial("/dev/ttyAMA0", 57600, timeout=0.5)
 
 volumeAngle = 45.0
 volumeScale = 100
 
 def skipAhead():
-    nextsong()
+    nextSong()
     pass
 
 def skipBack():
@@ -50,14 +50,49 @@ deltaVolume = 0
 def readSongData():
     global songList
 
-    names = open(path + "songNames.txt")
-    songList = names.splitlines()
+    names = open(path + "songNames.txt", 'r')
+    songData = names.read()
+    songList = songData.splitlines()
+
+def pauseSong():
+    global isPaused
+    isPaused = True
+    globalPlayer.pause()
+
+def playSong():
+    global isPaused
+    isPaused = False
+    globalPlayer.play()
+
+def prevSong():
+    global path
+    global currentSongIndex
+    if(currentSongIndex < 0 and globalPlayer.is_playing()):
+        currentSongIndex = len(songList)
+    else:
+        currentSongIndex = currentSongIndex - 1
+
+    globalPlayer = OMXPlayer(path + songList[currentSongIndex])
+    globalPlayer.play()
+
+def nextSong():
+    global currentSongIndex
+    global path
+    if(currentSongIndex >= len(songList) and globalPlayer.is_playing()):
+        currentSongIndex = 0
+    else:
+        currentSongIndex = currentSongIndex + 1
+
+    globalPlayer = OMXPlayer(path + songList[currentSongIndex])
+    globalPlayer.play()
+
+
+readSongData()
+globalPlayer = OMXPlayer(path + songList[0])
 
 while True:
-    readSongData()
-    globalPlayer = OMXPlayer(path + songList[0])
     if(not globalPlayer.is_playing() and not isPaused):
-        nextsong()
+        nextSong()
 
     while port.inWaiting() < 2:
         pass
@@ -115,36 +150,3 @@ while True:
     currentHeading = newHeading
 
     print newSide, newHeading, volume, deltaVolume
-
-
-def pauseSong():
-    global isPaused
-    isPaused = True
-    globalPlayer.pause()
-
-def playSong():
-    global isPaused
-    isPaused = False
-    globalPlayer.play()
-
-def prevSong():
-    global path
-    global currentSongIndex
-    if(currentSongIndex < 0 and globalPlayer.is_playing()):
-        currentSongIndex = len(songList)
-    else:
-        currentSongIndex = currentSongIndex - 1
-
-    globalPlayer = OMXPlayer(path + songList[currentSongIndex])
-    globalPlayer.play()
-
-def nextsong():
-    global currentSongIndex
-    global path
-    if(currentSongIndex >= len(songList) and globalPlayer.is_playing()):
-        currentSongIndex = 0
-    else:
-        currentSongIndex = currentSongIndex + 1
-
-    globalPlayer = OMXPlayer(path + songList[currentSongIndex])
-    globalPlayer.play(currentSongIndex)
